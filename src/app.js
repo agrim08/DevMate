@@ -25,6 +25,18 @@ app.patch("/user", (req, res) => {
   });
 });
 
+//reading user info:
+app.get("/testuser/:userID", (req, res) => {
+  console.log(req.params);
+  console.log(req.query); //printed to console
+  res.send({ city: "delhi", country: "India" });
+});
+
+//we can write regex also:
+app.get(/a/, (req, res) => {
+  res.send("Testing regex");
+});
+
 //This is for all http methods
 app.use("/test", (req, res) => {
   res.send("Test");
