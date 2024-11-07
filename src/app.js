@@ -70,10 +70,24 @@ app.delete("/user", async (req, res) => {
 });
 
 // Endpoint to update a user by ID
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
   const data = req.body;
+
   try {
+    const ALLOWED_UPDATES = [
+      "userId",
+      "photoUrl",
+      "Bio",
+      "gender",
+      "age",
+      "skills",
+    ];
+
+    const isAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+    if (!isAllowed) throw new Error("update is not allowed");
     const newUser = await User.findByIdAndUpdate(userId, data, {
       runValidators: true,
       returnDocument: "after",

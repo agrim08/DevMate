@@ -53,7 +53,4 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-// Forcefully create a unique index for emailId
-userSchema.index({ emailId: 1 }, { unique: true });
-
 module.exports = mongoose.model("User", userSchema);
