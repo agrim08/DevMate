@@ -39,12 +39,31 @@ app.get("/feed", async (req, res) => {
   }
 });
 
+//delete
 app.delete("/user", async (req, res) => {
   const userId = req.body.userId;
   try {
     const user = await User.findByIdAndDelete(userId);
     res.send("user deleted");
   } catch (error) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
+//update:
+app.patch("/user", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    // returnDocument :- beforeUpdate or afterUpdate
+    const newUser = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+      lean: true,
+    });
+    console.log(newUser);
+
+    res.send("user updated");
+  } catch (err) {
     res.status(500).send("Something went wrong");
   }
 });
