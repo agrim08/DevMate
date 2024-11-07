@@ -8,6 +8,9 @@ const userSchema = new Schema({
   lastName: {
     type: String,
   },
+  emailId: {
+    type: String,
+  },
   DateOfBirth: {
     type: Date,
     default: Date.now(),
