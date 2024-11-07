@@ -4,14 +4,14 @@ const User = require("./models/user.js");
 
 const app = express();
 
+// provided middeware to handle reques
+app.use(express.json());
+
 app.post("/signup", async (req, res) => {
+  console.log(req.body);
+
   //we can send custom ids
-  const user = new User({
-    firstName: "MS",
-    lastName: "Dhoni",
-    emailId: "ms7@dhoni.com",
-    passoword: "dhoni@123",
-  });
+  const user = new User(req.body);
   try {
     await user.save();
     res.send("success");
