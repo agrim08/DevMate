@@ -1,35 +1,54 @@
 const express = require("express");
+const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const User = require("./models/user.js");
+
 const app = express();
-// provided middeware to handle reques
+
+// Middleware to parse JSON requests
 app.use(express.json());
 
+// Drop the collection once to reset indexes if needed
+//* mongoose.connection.once("open", async () => {
+//*   try {
+//*     await mongoose.connection.db.dropCollection("users");
+//*     console.log("Dropped users collection to reset indexes.");
+//*   } catch (error) {
+//*     console.log("No existing users collection to drop.");
+//*   }
+
+// Ensure indexes are created after the collection is dropped
+//*   await User.syncIndexes();
+//*   console.log("Indexes are ensured.");
+//* });
+
+// Endpoint to create a new user
 app.post("/signup", async (req, res) => {
-  //we can send custom ids also
   const user = new User(req.body);
   try {
     await user.save();
-    res.send("success");
+    res.send("User created successfully");
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    if (err.code === 11000) {
+      res.status(400).send("Email already exists");
+    } else {
+      res.status(500).send(err.message);
+    }
   }
 });
 
-//get user by emailId
+// Endpoint to get user by emailId
 app.get("/user", async (req, res) => {
   try {
-    const users = await User.find({ emailId: req.body.emailId });
-    if (users.length === 0) res.status(404).send("User not found");
-    else {
-      res.send(users);
-    }
+    const user = await User.findOne({ emailId: req.body.emailId });
+    if (!user) res.status(404).send("User not found");
+    else res.send(user);
   } catch (error) {
     res.status(400).send("Something went wrong");
   }
 });
 
-//getting all users:
+// Endpoint to get all users
 app.get("/feed", async (req, res) => {
   try {
     const users = await User.find({});
@@ -39,42 +58,41 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-//delete
+// Endpoint to delete a user by ID
 app.delete("/user", async (req, res) => {
   const userId = req.body.userId;
   try {
-    const user = await User.findByIdAndDelete(userId);
-    res.send("user deleted");
+    await User.findByIdAndDelete(userId);
+    res.send("User deleted");
   } catch (error) {
     res.status(500).send("Something went wrong");
   }
 });
 
-//update:
+// Endpoint to update a user by ID
 app.patch("/user", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
   try {
-    // returnDocument :- beforeUpdate or afterUpdate
     const newUser = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
       returnDocument: "after",
       lean: true,
     });
-    console.log(newUser);
-
-    res.send("user updated");
+    res.send("User updated");
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    res.status(500).send(err.message);
   }
 });
 
+// Connect to the database and start the server
 connectDB()
   .then(() => {
     app.listen(4000, () => {
-      console.log("listening on port 4000");
+      console.log("Listening on port 4000");
     });
     console.log("Database connected successfully");
   })
   .catch((err) => {
-    console.error("Connection failed");
+    console.error("Database connection failed", err);
   });
