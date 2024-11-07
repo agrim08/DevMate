@@ -32,11 +32,20 @@ app.get("/user", async (req, res) => {
 //getting all users:
 app.get("/feed", async (req, res) => {
   try {
-    console.log("in try block");
     const users = await User.find({});
     res.send(users);
   } catch (error) {
     res.status(400).send("Something went wrong");
+  }
+});
+
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    res.send("user deleted");
+  } catch (error) {
+    res.status(500).send("Something went wrong");
   }
 });
 
