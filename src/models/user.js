@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const validator = require("validator");
 
 const userSchema = new Schema(
   {
@@ -20,20 +21,18 @@ const userSchema = new Schema(
       lowercase: true,
       unique: true,
       trim: true,
-      validate(valid) {
-        if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(valid)) {
-          throw new Error("Invalid email format");
-        }
+      validate(value) {
+        if (!validator.isEmail(value))
+          throw new Error("Invalid email format" + value);
       },
     },
     password: {
       type: String,
       required: true,
       minLength: 8,
-      validate(valid) {
-        if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d\S]{8,}$/.test(valid)) {
-          throw new Error("Choose a strong password");
-        }
+      validate(value) {
+        if (!validator.isStrongPassword(value))
+          throw new Error("password is not strong");
       },
     },
     DateOfBirth: {
@@ -62,6 +61,9 @@ const userSchema = new Schema(
       type: String,
       default:
         "https://www.ihna.edu.au/blog/wp-content/uploads/2022/10/user-dummy.png",
+      validate(value) {
+        if (!validator.isURL(value)) throw new Error("Invalid Photo URL");
+      },
     },
   },
   { timestamps: true }
