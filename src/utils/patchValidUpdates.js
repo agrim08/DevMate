@@ -1,7 +1,7 @@
 const ALLOWED_UPDATES = [
   "userId",
   "photoUrl",
-  "Bio",
+  "bio",
   "gender",
   "age",
   "skills",

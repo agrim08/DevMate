@@ -4,6 +4,7 @@ const connectDB = require("./config/database");
 const User = require("./models/user.js");
 const { checkAllowedUpdates } = require("./utils/patchValidUpdates.js");
 const { signUpValidation } = require("./utils/signUpValidtation.js");
+const bcrypt = require("bcrypt");
 
 const app = express();
 
@@ -13,8 +14,36 @@ app.use(express.json());
 // Endpoint to create a new user
 app.post("/signup", async (req, res) => {
   try {
+    //Validation:
     signUpValidation(req);
-    const user = new User(req.body);
+
+    //encryption:
+    const {
+      firstName,
+      lastName,
+      emailId,
+      password,
+      bio,
+      DateOfBirth,
+      gender,
+      skills,
+      photoUrl,
+    } = req.body;
+    const passwordHash = await bcrypt.hash(password, 10);
+    //* console.log(passwordHash);
+
+    //storing
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+      photoUrl,
+      skills,
+      gender,
+      bio,
+      DateOfBirth,
+    });
     await user.save();
     res.send("User created successfully");
   } catch (err) {
@@ -26,6 +55,26 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+//login api
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
+    }
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
+    if (isValidPassword) {
+      res.send("Login successful");
+    } else {
+      throw new Error("Invalid credentials");
+    }
+  } catch (error) {
+    res.status(400).send("Error: " + error.message);
+  }
+});
+
 // Endpoint to get user by emailId
 app.get("/user", async (req, res) => {
   try {
@@ -33,7 +82,7 @@ app.get("/user", async (req, res) => {
     if (!user) res.status(404).send("User not found");
     else res.send(user);
   } catch (error) {
-    res.status(400).send("Something went wrong");
+    res.status(400).send("Error: " + error.message);
   }
 });
 

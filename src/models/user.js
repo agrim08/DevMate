@@ -47,7 +47,7 @@ const userSchema = new Schema(
         }
       },
     },
-    Bio: {
+    bio: {
       type: String,
       default: "This is a default bio",
       minLength: 20,
