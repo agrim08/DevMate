@@ -7,9 +7,12 @@ const userSchema = new Schema(
       type: String,
       required: true,
       minLength: 3,
+      maxLength: 10,
     },
     lastName: {
       type: String,
+      minLength: 3,
+      maxLength: 15,
     },
     emailId: {
       type: String,
@@ -17,20 +20,28 @@ const userSchema = new Schema(
       lowercase: true,
       unique: true,
       trim: true,
+      validate(valid) {
+        if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(valid)) {
+          throw new Error("Invalid email format");
+        }
+      },
     },
     password: {
       type: String,
       required: true,
+      minLength: 8,
+      validate(valid) {
+        if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d\S]{8,}$/.test(valid)) {
+          throw new Error("Choose a strong password");
+        }
+      },
     },
     DateOfBirth: {
       type: Date,
-      default: Date.now(),
-    },
-    age: {
-      type: Number,
     },
     gender: {
       type: String,
+      lowercase: true,
       validate(valid) {
         if (!["male", "female", "others"].includes(valid)) {
           throw new Error("Invalid Gender");
@@ -40,9 +51,12 @@ const userSchema = new Schema(
     Bio: {
       type: String,
       default: "This is a default bio",
+      minLength: 20,
+      maxLength: 150,
     },
     skills: {
       type: [String],
+      default: [],
     },
     photoUrl: {
       type: String,
@@ -53,4 +67,10 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+userSchema.virtual("age").get(function () {
+  if (!this.dateOfBirth) return null;
+  const ageDiff = Date.now() - this.dateOfBirth.getTime();
+  const ageDate = new Date(ageDiff);
+  return Math.abs(ageDate.getUTCFullYear() - 1970);
+});
 module.exports = mongoose.model("User", userSchema);

@@ -8,20 +8,6 @@ const app = express();
 // Middleware to parse JSON requests
 app.use(express.json());
 
-// Drop the collection once to reset indexes if needed
-//* mongoose.connection.once("open", async () => {
-//*   try {
-//*     await mongoose.connection.db.dropCollection("users");
-//*     console.log("Dropped users collection to reset indexes.");
-//*   } catch (error) {
-//*     console.log("No existing users collection to drop.");
-//*   }
-
-// Ensure indexes are created after the collection is dropped
-//*   await User.syncIndexes();
-//*   console.log("Indexes are ensured.");
-//* });
-
 // Endpoint to create a new user
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
