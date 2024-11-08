@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const User = require("./models/user.js");
+const { checkAllowedUpdates } = require("./utils/patchValidUpdates.js");
+const { signUpValidation } = require("./utils/signUpValidtation.js");
 
 const app = express();
 
@@ -10,8 +12,9 @@ app.use(express.json());
 
 // Endpoint to create a new user
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
   try {
+    signUpValidation(req);
+    const user = new User(req.body);
     await user.save();
     res.send("User created successfully");
   } catch (err) {
@@ -61,18 +64,7 @@ app.patch("/user/:userId", async (req, res) => {
   const data = req.body;
 
   try {
-    const ALLOWED_UPDATES = [
-      "userId",
-      "photoUrl",
-      "Bio",
-      "gender",
-      "age",
-      "skills",
-    ];
-
-    const isAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
+    const isAllowed = checkAllowedUpdates(data);
     if (!isAllowed) throw new Error("update is not allowed");
     const newUser = await User.findByIdAndUpdate(userId, data, {
       runValidators: true,
