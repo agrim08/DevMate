@@ -5,11 +5,14 @@ const User = require("./models/user.js");
 const { checkAllowedUpdates } = require("./utils/patchValidUpdates.js");
 const { signUpValidation } = require("./utils/signUpValidtation.js");
 const bcrypt = require("bcrypt");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
 // Middleware to parse JSON requests
 app.use(express.json());
+app.use(cookieParser());
 
 // Endpoint to create a new user
 app.post("/signup", async (req, res) => {
@@ -66,12 +69,41 @@ app.post("/login", async (req, res) => {
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (isValidPassword) {
+      //jwt token created
+      const token = await jwt.sign({ _id: user._id }, "!&DEV#Mate!&");
+
+      //cookie parser
+      res.cookie("token", token);
       res.send("Login successful");
     } else {
       throw new Error("Invalid credentials");
     }
   } catch (error) {
     res.status(400).send("Error: " + error.message);
+  }
+});
+
+//profile
+app.get("/profile", async (req, res) => {
+  try {
+    const cookies = req.cookies;
+    const { token } = cookies;
+    if (!token) {
+      throw new Error("Invalid token");
+    }
+
+    //verifying token
+    const decodedMessage = await jwt.verify(token, "!&DEV#Mate!&");
+    const { _id } = decodedMessage;
+
+    const user = await User.findById(_id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    res.send(user);
+  } catch (error) {
+    res.send("ERROR : " + error.message);
   }
 });
 
