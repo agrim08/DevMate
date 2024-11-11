@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const bcrypt = require("bcrypt");
 const validator = require("validator");
 
 const userSchema = new Schema(
@@ -69,10 +70,30 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+userSchema.methods.getJWT = async function () {
+  const user = this;
+
+  const token = await jwt.sign({ _id: user._id }, "!&DEV#Mate!&", {
+    expiresIn: "1d",
+  });
+
+  return token;
+};
+
+userSchema.methods.validatePassword = async function (userEnteredPassword) {
+  const user = this;
+  const passwordHash = user.password;
+  const isPasswordValid = await bcrypt.compare(
+    userEnteredPassword,
+    passwordHash
+  );
+};
+
 userSchema.virtual("age").get(function () {
   if (!this.dateOfBirth) return null;
   const ageDiff = Date.now() - this.dateOfBirth.getTime();
   const ageDate = new Date(ageDiff);
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 });
+
 module.exports = mongoose.model("User", userSchema);
