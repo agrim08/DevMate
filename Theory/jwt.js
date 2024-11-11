@@ -7,7 +7,7 @@ const { signUpValidation } = require("./utils/signUpValidtation.js");
 const bcrypt = require("bcrypt");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
-const { userAuth } = require("./middlewares/auth.js");
+const { userAuth } = require("./middlewares/userAuth.js");
 
 const app = express();
 
@@ -71,14 +71,10 @@ app.post("/login", async (req, res) => {
 
     if (isValidPassword) {
       //jwt token created
-      const token = await jwt.sign({ _id: user._id }, "!&DEV#Mate!&", {
-        expiresIn: "1d",
-      });
+      const token = await jwt.sign({ _id: user._id }, "!&DEV#Mate!&");
 
       //cookie parser
-      res.cookie("token", token, {
-        expires: new Date(Date.now() + 1 * 3600000), //cookie will expire in 1 hr
-      });
+      res.cookie("token", token);
       res.send("Login successful");
     } else {
       throw new Error("Invalid credentials");
@@ -98,12 +94,55 @@ app.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-//Send connect request
-app.post("/sendconnectionrequest", userAuth, async (req, res) => {
-  const user = req.user;
+// Endpoint to get user by emailId
+app.get("/user", async (req, res) => {
+  try {
+    const user = await User.findOne({ emailId: req.body.emailId });
+    if (!user) res.status(404).send("User not found");
+    else res.send(user);
+  } catch (error) {
+    res.status(400).send("Error: " + error.message);
+  }
+});
 
-  console.log("Connect request sent");
-  res.send(user.firstName + " sent a connection request");
+// Endpoint to get all users
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (error) {
+    res.status(400).send("Something went wrong");
+  }
+});
+
+// Endpoint to delete a user by ID
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    await User.findByIdAndDelete(userId);
+    res.send("User deleted");
+  } catch (error) {
+    res.status(500).send("Something went wrong");
+  }
+});
+
+// Endpoint to update a user by ID
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
+  const data = req.body;
+
+  try {
+    const isAllowed = checkAllowedUpdates(data);
+    if (!isAllowed) throw new Error("update is not allowed");
+    const newUser = await User.findByIdAndUpdate(userId, data, {
+      runValidators: true,
+      returnDocument: "after",
+      lean: true,
+    });
+    res.send("User updated");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 // Connect to the database and start the server
