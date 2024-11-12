@@ -103,7 +103,7 @@ app.post("/sendconnectionrequest", userAuth, async (req, res) => {
   const { emailId } = req.body;
   const user = await User.findOne({ emailId: emailId });
 
-  console.log("Connect request sent");
+  console.log("Connection request sent");
   res.send("You send a connection request to " + user.firstName);
 });
 
