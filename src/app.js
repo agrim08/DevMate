@@ -99,10 +99,12 @@ app.get("/profile", userAuth, async (req, res) => {
 
 //Send connect request
 app.post("/sendconnectionrequest", userAuth, async (req, res) => {
-  const user = req.user;
+  //*! #################
+  const { emailId } = req.body;
+  const user = await User.findOne({ emailId: emailId });
 
   console.log("Connect request sent");
-  res.send(user.firstName + " sent a connection request");
+  res.send("You send a connection request to " + user.firstName);
 });
 
 // Connect to the database and start the server
