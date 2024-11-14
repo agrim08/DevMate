@@ -25,6 +25,14 @@ const connectionSchema = new Schema(
   }
 );
 
+connectionSchema.pre("save", function (next) {
+  const connectionRequest = this;
+  if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
+    throw new Error("Invalid connection request");
+  }
+  next();
+});
+
 const ConnectionRequestModel = new mongoose.model(
   "ConnectionRequest",
   connectionSchema
