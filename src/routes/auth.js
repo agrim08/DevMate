@@ -1,8 +1,8 @@
 const express = require("express");
 const User = require("../models/user.js");
 const bcrypt = require("bcrypt");
-const { userAuth } = require("../middlewares/auth.js");
 const { signUpValidation } = require("../utils/signUpValidtation.js");
+const { userAuth } = require("../middlewares/auth.js");
 
 const authRouter = express.Router();
 
@@ -66,7 +66,7 @@ authRouter.post("/login", async (req, res) => {
 
       //cookie parser
       res.cookie("token", token, {
-        expires: new Date(Date.now() + 8 * 3600000), //cookie will expire in 1 hr
+        expires: new Date(Date.now() + 8 * 3600000), //cookie will expire in 8 hr
       });
 
       res.send("Login successful");
@@ -83,6 +83,24 @@ authRouter.post("/logout", (req, res) => {
     expires: new Date(Date.now()),
   });
   res.send("logout successful");
+});
+
+authRouter.post("/forgotPassword", userAuth, async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      throw new Error("New password required");
+    }
+
+    const hashPassword = await bcrypt.hash(newPassword, 10);
+    const userId = req.user._id;
+
+    await User.findByIdAndUpdate(userId, { password: hashPassword });
+
+    res.send("Your password has been updated");
+  } catch (error) {
+    res.status(500).send("Error: " + error.message);
+  }
 });
 
 module.exports = authRouter;
