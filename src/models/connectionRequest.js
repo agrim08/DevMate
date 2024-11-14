@@ -25,6 +25,8 @@ const connectionSchema = new Schema(
   }
 );
 
+connectionSchema.index({ fromUserId: 1, toUserId: 1 });
+
 connectionSchema.pre("save", function (next) {
   const connectionRequest = this;
   if (connectionRequest.fromUserId.equals(connectionRequest.toUserId)) {
