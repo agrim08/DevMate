@@ -4,6 +4,15 @@ const ConnectionRequest = require("../models/connectionRequest");
 
 const userRouter = express.Router();
 
+const populateData = [
+  "firstName",
+  "lastName",
+  "photoUrl",
+  "bio",
+  "gender",
+  "skills",
+];
+
 userRouter.get("/user/requests/pending", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
@@ -11,7 +20,7 @@ userRouter.get("/user/requests/pending", userAuth, async (req, res) => {
     const pendingConnectionRequest = await ConnectionRequest.find({
       toUserId: loggedInUser._id,
       status: "interested",
-    }).populate("fromUserId", ["firstName", "lastName"]);
+    }).populate("fromUserId", populateData);
     res.json({
       message: "Connection request fetched Successfully",
       data: pendingConnectionRequest,
@@ -29,8 +38,10 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
         { toUserId: loggedInUser._id, status: "accepted" },
         { fromUserId: loggedInUser._id, status: "accepted" },
       ],
-    }).populate("fromUserId", ["firstName", "lastName"]);
-    res.json({ data: connections });
+    }).populate("fromUserId", populateData);
+
+    const data = connections.map((row) => row.fromUserId);
+    res.json({ data: data });
   } catch (error) {
     res.status(400).send("ERROR :" + error.message);
   }
