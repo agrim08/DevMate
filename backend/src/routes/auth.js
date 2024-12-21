@@ -69,7 +69,7 @@ authRouter.post("/login", async (req, res) => {
         expires: new Date(Date.now() + 8 * 3600000), //cookie will expire in 8 hr
       });
 
-      res.send("Login successful");
+      res.send(user);
     } else {
       throw new Error("Invalid credentials");
     }
