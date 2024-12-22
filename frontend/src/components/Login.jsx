@@ -100,8 +100,8 @@ const Login = () => {
                 onChange={(e) => setEmailId(e.target.value)}
               />
             </div>
-            {errors.emailId && (
-              <p className="text-red-500 text-sm mt-1">{errors.emailId}</p>
+            {errors?.emailId && (
+              <p className="text-red-500 text-sm mt-1">{errors?.emailId}</p>
             )}
           </div>
           <div>
@@ -138,8 +138,8 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            {errors?.password && (
+              <p className="text-red-500 text-sm mt-1">{errors?.password}</p>
             )}
           </div>
           {errors && (

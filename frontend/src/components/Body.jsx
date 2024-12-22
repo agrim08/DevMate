@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Navbar from "./Navbar";
 import { Outlet, useNavigate } from "react-router-dom";
 import Footer from "./Footer";
@@ -34,7 +34,9 @@ const Body = () => {
   return (
     <div>
       <Navbar />
-      <Outlet />
+      <div className="main-content">
+        <Outlet />
+      </div>
       <Footer />
     </div>
   );
