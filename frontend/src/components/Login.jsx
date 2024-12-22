@@ -8,27 +8,57 @@ import { BASE_URL } from "../utils/constants";
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
-  const dispact = useDispatch();
+  const [errors, setErrors] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const validateInputs = () => {
+    let validationError = "";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailId.trim()) {
+      validationError += "Email is required.\n";
+    } else if (!emailRegex.test(emailId)) {
+      validationError += "Enter a valid email.\n";
+    }
+
+    if (!password.trim()) {
+      validationError += "Password is required.\n";
+    } else if (password.length < 6) {
+      validationError += "Password must be at least 6 characters.\n";
+    }
+
+    setErrors(validationError.trim());
+    return validationError === ""; // Return true if no errors
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!validateInputs()) return;
+
     try {
+      setIsLoading(true);
       const res = await axios.post(
         `${BASE_URL}/login`,
         {
-          emailId: emailId,
-          password: password,
+          emailId,
+          password,
         },
         { withCredentials: true }
       );
-      dispact(addUser(res.data));
+      dispatch(addUser(res.data));
+      setIsLoading(false);
+      setErrors("");
       navigate("/");
     } catch (error) {
-      console.log(error.message);
-      return;
+      setErrors(error?.response?.data);
+      console.error("Login failed:", error.message);
     }
   };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
       <div className="bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-sm">
@@ -70,6 +100,9 @@ const Login = () => {
                 onChange={(e) => setEmailId(e.target.value)}
               />
             </div>
+            {errors.emailId && (
+              <p className="text-red-500 text-sm mt-1">{errors.emailId}</p>
+            )}
           </div>
           <div>
             <label
@@ -105,9 +138,30 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
-          <button className="w-full bg-info text-white py-2 rounded hover:bg-blue-700 transition font-semibold my-10">
-            Login
+          {errors && (
+            <div
+              className="toast transition-all duration-200 ease-in-out"
+              style={{
+                transform: errors ? "translateX(0)" : "translateX(100%)",
+                opacity: errors ? 1 : 0,
+              }}
+            >
+              <div className="alert alert-info bg-red-600">
+                <span>{errors}</span>
+              </div>
+            </div>
+          )}
+
+          <button className="w-full bg-info text-white py-2 rounded hover:bg-blue-700 hover:scale-105 transition font-semibold my-10 bg-gradient-to-r from-purple-600 to-blue-600">
+            {isLoading && !errors ? (
+              <span className="loading loading-dots loading-md"></span>
+            ) : (
+              <div>Login</div>
+            )}
           </button>
         </form>
         <p className="mt-6 text-center text-sm text-gray-400">
