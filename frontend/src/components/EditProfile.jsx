@@ -39,7 +39,13 @@ const EditProfile = ({ user }) => {
           skills,
           photoUrl,
         },
-        { withCredentials: true }
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json", // Ensure proper content type is sent
+            // "Access-Control-Allow-Methods": "POST,PUT,GET,PATCH,OPTIONS",
+          },
+        }
       );
 
       dispatch(addUser(res?.data?.data));
