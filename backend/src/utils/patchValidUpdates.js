@@ -5,6 +5,8 @@ const ALLOWED_UPDATES = [
   "gender",
   "age",
   "skills",
+  "firstName",
+  "lastName",
 ];
 
 const checkAllowedUpdates = (data) => {

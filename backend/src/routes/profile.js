@@ -20,7 +20,6 @@ profileRouter.put("/profile/edit", userAuth, async (req, res) => {
       throw new Error("You are not allowed to update this field");
     }
     const loggedInuser = req.user;
-    console.log("here");
 
     Object.keys(req.body).forEach((key) => (loggedInuser[key] = req.body[key]));
     await loggedInuser.save();

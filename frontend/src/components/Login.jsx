@@ -36,6 +36,7 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrors("");
 
     if (!validateInputs()) return;
 
