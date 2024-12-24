@@ -46,7 +46,7 @@ const Connections = () => {
 
       {connectionData.map((connection) => (
         <div
-          className="carousel carousel-center bg-gradient-to-r from-[#0f172a] to-[#334155] rounded-box space-x-4 p-4 gap-2 my-20 mx-10 max-w-md"
+          className="carousel carousel-center bg-gradient-to-r from-[#0f172a] to-[#334155] rounded-box space-x-4 p-4 gap-2 my-20 mx-10 max-w-md ml-28"
           key={connection?._id}
         >
           <div className="carousel-item h-[280px] w-[450px] overflow-hidden ">
