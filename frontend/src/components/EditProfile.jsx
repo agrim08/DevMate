@@ -32,8 +32,6 @@ const EditProfile = ({ user }) => {
       const res = await axios.put(
         `${BASE_URL}/profile/edit`,
         {
-          firstName,
-          lastName,
           age,
           bio,
           skills,

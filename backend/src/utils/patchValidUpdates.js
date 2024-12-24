@@ -8,8 +8,8 @@ const ALLOWED_UPDATES = [
 ];
 
 const checkAllowedUpdates = (data) => {
-  const allowedUpdates = Object.keys(data).every((k) =>
-    ALLOWED_UPDATES.includes(k)
+  const allowedUpdates = Object?.keys(data)?.every((k) =>
+    ALLOWED_UPDATES?.includes(k)
   );
   return allowedUpdates;
 };
