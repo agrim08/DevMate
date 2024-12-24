@@ -35,9 +35,9 @@ const Connections = () => {
 
   return (
     <div className="">
-      <div class="max-w-3xl mx-auto text-center mt-16">
-        <h1 class="text-4xl font-bold text-gray-900 leading-tight mb-2 pb-4 relative">
-          <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
+      <div className="max-w-3xl mx-auto text-center mt-16">
+        <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-2 pb-4 relative">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">
             YOUR CONNECTIONS
           </span>
           <span class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500"></span>
@@ -45,7 +45,10 @@ const Connections = () => {
       </div>
 
       {connectionData.map((connection) => (
-        <div className="carousel carousel-center bg-gradient-to-r from-[#0f172a] to-[#334155] rounded-box space-x-4 p-4 gap-2 my-20 mx-10 max-w-md">
+        <div
+          className="carousel carousel-center bg-gradient-to-r from-[#0f172a] to-[#334155] rounded-box space-x-4 p-4 gap-2 my-20 mx-10 max-w-md"
+          key={connection?._id}
+        >
           <div className="carousel-item h-[280px] w-[450px] overflow-hidden ">
             <img
               src={connection?.photoUrl}
@@ -55,7 +58,7 @@ const Connections = () => {
               <div className="bg-gradient-to-tl from-purple-500 via-blue-500 to-zinc-400 bg-clip-text text-transparent text-2xl font-semibold text-justify mt-9 mx-5">{`${connection?.firstName} ${connection?.lastName}`}</div>
               <div className="my-4 mx-5 flex flex-col gap-2 bg-[conic-gradient(at_top_left,_var(--tw-gradient-stops))] from-orange-800 via-pink-100 to-slate-200 bg-clip-text text-transparent">
                 <div>{`AGE- ${connection?.userAge}`}</div>
-                <div>{` GEMDER- ${connection?.gender}`}</div>
+                <div>{` GENDER- ${connection?.gender}`}</div>
                 <div>{`BIO- ${connection?.bio}`}</div>
                 <div>{`SKILLS- ${connection?.skills}`}</div>
               </div>
