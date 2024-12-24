@@ -8,7 +8,7 @@ import axios from "axios";
 const EditProfile = ({ user }) => {
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
-  const [age, setAge] = useState(user?.age || "");
+  const [userAge, setUserAge] = useState(user?.userAge || "");
   const [gender, setGender] = useState(user?.gender || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [skills, setSkills] = useState(user?.skills || "");
@@ -24,11 +24,11 @@ const EditProfile = ({ user }) => {
   const previewUser = {
     firstName,
     lastName,
-    age,
+    userAge,
     bio,
     skills,
-    photoUrl: user?.photoUrl,
-    gender: user?.gender,
+    photoUrl,
+    gender,
   };
 
   const updateProfile = async (e) => {
@@ -39,7 +39,7 @@ const EditProfile = ({ user }) => {
 
       const res = await axios.put(
         `${BASE_URL}/profile/edit`,
-        { age, bio, skills, photoUrl },
+        { userAge, bio, skills, photoUrl },
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
@@ -148,8 +148,8 @@ const EditProfile = ({ user }) => {
                   id="age"
                   className="w-full p-3 bg-gray-700 text-white rounded"
                   placeholder="Age"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
+                  value={userAge}
+                  onChange={(e) => setUserAge(e.target.value)}
                 />
               </div>
               <div>

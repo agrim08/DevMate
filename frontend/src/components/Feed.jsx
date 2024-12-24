@@ -26,6 +26,8 @@ const Feed = () => {
     getFeed();
   }, []);
 
+  if (!feed) return;
+
   return (
     feed && (
       <div className="flex justify-center items-center bg-base-100">

@@ -16,9 +16,12 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 profileRouter.put("/profile/edit", userAuth, async (req, res) => {
   try {
+    console.log("Incoming update keys:", Object.keys(req.body)); // Debugging line
+
     if (!checkAllowedUpdates(req?.body)) {
       throw new Error("You are not allowed to update this field");
     }
+
     const loggedInuser = req.user;
 
     Object.keys(req.body).forEach((key) => (loggedInuser[key] = req.body[key]));
@@ -29,6 +32,7 @@ profileRouter.put("/profile/edit", userAuth, async (req, res) => {
       data: loggedInuser,
     });
   } catch (err) {
+    console.error(err.message); // Log the error message for debugging
     res.status(403).send("ERROR : " + err.message);
   }
 });

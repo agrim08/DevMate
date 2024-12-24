@@ -1,5 +1,6 @@
 const UserCard = ({ user }) => {
-  const { firstName, lastName, photoUrl, age, gender, bio } = user;
+  if (!user) return null;
+  const { firstName, lastName, photoUrl, userAge, gender, bio } = user;
 
   return (
     user && (
@@ -16,10 +17,14 @@ const UserCard = ({ user }) => {
           />
         </figure>
         <div className="card-body w-72 h-60 bg-gray-200 text-black rounded-r-xl">
-          <h2 className="card-title">{`${firstName} ${lastName}`}</h2>
+          <h2 className="card-title">{`${firstName || ""} ${
+            lastName || ""
+          }`}</h2>
 
-          {age && gender && <p className="text-black">{age + " " + gender}</p>}
-          {bio && <p className="text-black">{bio}</p>}
+          {userAge && gender && (
+            <p className="text-black">{userAge || "" + " " + gender || ""}</p>
+          )}
+          {bio && <p className="text-black">{bio || ""}</p>}
 
           <div className="card-actions flex justify-evenly">
             <button className="btn btn-error">Ignore</button>

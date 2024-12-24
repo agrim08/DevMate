@@ -36,18 +36,19 @@ userRouter.get("/user/connections", userAuth, async (req, res) => {
     const loggedInUser = req.user;
     const connections = await ConnectionRequest.find({
       $or: [
-        { toUserId: loggedInUser._id, status: "accepted" },
-        { fromUserId: loggedInUser._id, status: "accepted" },
+        { toUserId: loggedInUser?._id, status: "accepted" },
+        { fromUserId: loggedInUser?._id, status: "accepted" },
       ],
     })
       .populate("fromUserId", populateData)
-      .populate("toUserId", populatedData);
+      .populate("toUserId", populateData);
 
     const data = connections.map((row) => {
-      fromUserId._id.toString() === loggedInUser._id.toString()
-        ? row.toUserId
-        : row.fromUserId;
+      return row.fromUserId?._id?.toString() === loggedInUser?._id?.toString()
+        ? row?.toUserId
+        : row?.fromUserId;
     });
+
     res.json({ data: data });
   } catch (error) {
     res.status(400).send("ERROR :" + error.message);

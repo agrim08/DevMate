@@ -3,17 +3,17 @@ const ALLOWED_UPDATES = [
   "photoUrl",
   "bio",
   "gender",
-  "age",
+  "userAge",
   "skills",
   "firstName",
   "lastName",
 ];
 
 const checkAllowedUpdates = (data) => {
-  const allowedUpdates = Object?.keys(data)?.every((k) =>
-    ALLOWED_UPDATES?.includes(k)
-  );
-  return allowedUpdates;
+  const allowedUpdatesLower = ALLOWED_UPDATES.map((key) => key.toLowerCase());
+  const incomingKeys = Object.keys(data).map((key) => key.toLowerCase());
+
+  return incomingKeys.every((key) => allowedUpdatesLower.includes(key));
 };
 
 module.exports = { checkAllowedUpdates };

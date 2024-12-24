@@ -40,6 +40,9 @@ const userSchema = new Schema(
     DateOfBirth: {
       type: Date,
     },
+    userAge: {
+      type: Number,
+    },
     gender: {
       type: String,
       lowercase: true,
@@ -90,11 +93,11 @@ userSchema.methods.validatePassword = async function (userEnteredPassword) {
   return isPasswordValid;
 };
 
-userSchema.virtual("age").get(function () {
-  if (!this.dateOfBirth) return null;
-  const ageDiff = Date.now() - this.dateOfBirth.getTime();
-  const ageDate = new Date(ageDiff);
-  return Math.abs(ageDate.getUTCFullYear() - 1970);
-});
+// userSchema.virtual("age").get(function () {
+//   if (!this.dateOfBirth) return null;
+//   const ageDiff = Date.now() - this.dateOfBirth.getTime();
+//   const ageDate = new Date(ageDiff);
+//   return Math.abs(ageDate.getUTCFullYear() - 1970);
+// });
 
 module.exports = mongoose.model("User", userSchema);
