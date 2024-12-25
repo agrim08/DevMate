@@ -1,6 +1,26 @@
+import { BASE_URL } from "../utils/constants";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { removeUserFromFeed } from "../utils/feedSlice";
+
 const UserCard = ({ user }) => {
   if (!user) return null;
-  const { firstName, lastName, photoUrl, userAge, gender, bio } = user;
+  const { _id, firstName, lastName, photoUrl, userAge, gender, bio } = user;
+  const dispatch = useDispatch();
+  // const feed =
+
+  const handleSendRequest = async (status, _id) => {
+    try {
+      const res = await axios.post(
+        `${BASE_URL}/request/send/${status}/${_id}`,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeUserFromFeed(_id));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     user && (
@@ -27,8 +47,18 @@ const UserCard = ({ user }) => {
           {bio && <p className="text-black">{bio || ""}</p>}
 
           <div className="card-actions flex justify-evenly">
-            <button className="btn btn-error">Ignore</button>
-            <button className="btn btn-success">Follow</button>
+            <button
+              className="btn btn-error"
+              onClick={() => handleSendRequest("ignored", _id)}
+            >
+              Ignore
+            </button>
+            <button
+              className="btn btn-success"
+              onClick={() => handleSendRequest("interested", _id)}
+            >
+              Follow
+            </button>
           </div>
         </div>
       </div>
