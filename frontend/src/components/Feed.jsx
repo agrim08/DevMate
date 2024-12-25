@@ -28,6 +28,11 @@ const Feed = () => {
 
   if (!feed) return;
 
+  if (feed.length === 0)
+    return (
+      <h1 className="text-center mt-10 text-2xl">No new users currently</h1>
+    );
+
   return (
     feed && (
       <div className="flex justify-center items-center bg-base-100">

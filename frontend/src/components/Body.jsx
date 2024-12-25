@@ -32,7 +32,7 @@ const Body = () => {
   }, []);
 
   return (
-    <div>
+    <div className="bg-gray-900">
       <Navbar />
       <div className="main-content">
         <Outlet />

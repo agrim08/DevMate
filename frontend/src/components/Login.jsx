@@ -8,8 +8,11 @@ import { BASE_URL } from "../utils/constants";
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [errors, setErrors] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoginForm, setIsLoginForm] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -60,13 +63,124 @@ const Login = () => {
     }
   };
 
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    setErrors("");
+
+    if (!validateInputs()) return;
+
+    try {
+      setIsLoading(true);
+      const res = await axios.post(
+        `${BASE_URL}/signup`,
+        {
+          emailId,
+          password,
+          firstName,
+          lastName,
+        },
+        { withCredentials: true }
+      );
+      dispatch(addUser(res?.data?.data));
+      setIsLoading(false);
+      setEmailId("");
+      setFirstName("");
+      setLastName("");
+      setPassword("");
+      setErrors("");
+      navigate("/profile");
+    } catch (error) {
+      setErrors(error?.response?.data);
+      console.error("signup failed:", error.message);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center my-3">
       <div className="bg-gray-800 p-10 rounded-lg shadow-lg w-full max-w-sm">
         <h2 className="text-3xl font-bold text-center text-white mb-6">
-          Login
+          {isLoginForm ? "Login" : "Sign Up"}
         </h2>
-        <form className="space-y-6" onSubmit={handleLogin} method="POST">
+        <form
+          className="space-y-6"
+          onSubmit={isLoginForm ? handleLogin : handleSignUp}
+          method="POST"
+        >
+          {!isLoginForm ? (
+            <>
+              <div>
+                <label
+                  htmlFor="firstName"
+                  className="block text-gray-300 font-medium mb-2"
+                >
+                  First Name
+                </label>
+                <div className="flex items-center bg-gray-700 border border-gray-600 rounded focus-within:ring-2 focus-within:ring-blue-500">
+                  <span className="px-3 text-gray-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21.75 6.75L12 13.5 2.25 6.75M21.75 6.75v10.5A2.25 2.25 0 0119.5 19.5h-15a2.25 2.25 0 01-2.25-2.25V6.75M21.75 6.75L12 13.5 2.25 6.75"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    id="firstName"
+                    name="firstName"
+                    className="w-full p-3 bg-gray-700 text-white placeholder-gray-400 focus:outline-none rounded-r"
+                    placeholder="Enter your email"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="lastName"
+                  className="block text-gray-300 font-medium mb-2"
+                >
+                  Last Name
+                </label>
+                <div className="flex items-center bg-gray-700 border border-gray-600 rounded focus-within:ring-2 focus-within:ring-blue-500">
+                  <span className="px-3 text-gray-400">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth="1.5"
+                      stroke="currentColor"
+                      className="w-5 h-5"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M21.75 6.75L12 13.5 2.25 6.75M21.75 6.75v10.5A2.25 2.25 0 0119.5 19.5h-15a2.25 2.25 0 01-2.25-2.25V6.75M21.75 6.75L12 13.5 2.25 6.75"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    id="lastName"
+                    name="lastName"
+                    className="w-full p-3 bg-gray-700 text-white placeholder-gray-400 focus:outline-none rounded-r"
+                    placeholder="Enter your email"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                  />
+                </div>
+              </div>
+            </>
+          ) : null}
+
           <div>
             <label
               htmlFor="email"
@@ -161,16 +275,31 @@ const Login = () => {
             {isLoading && !errors ? (
               <span className="loading loading-dots loading-md"></span>
             ) : (
-              <div>Login</div>
+              <div>{isLoginForm ? "Login" : "SignUp"}</div>
             )}
           </button>
         </form>
-        <p className="mt-6 text-center text-sm text-gray-400">
-          Don't have an account?{" "}
-          <a href="/register" className="text-blue-400 hover:underline">
-            Register
-          </a>
-        </p>
+        {isLoginForm ? (
+          <p className="mt-6 text-center text-sm text-gray-400">
+            Don't have an account?{" "}
+            <button
+              onClick={() => setIsLoginForm(!isLoginForm)}
+              className="text-blue-400 hover:underline"
+            >
+              Register
+            </button>
+          </p>
+        ) : (
+          <p className="mt-6 text-center text-sm text-gray-400">
+            Already have an account?{" "}
+            <button
+              onClick={() => setIsLoginForm(!isLoginForm)}
+              className="text-blue-400 hover:underline"
+            >
+              Login
+            </button>
+          </p>
+        )}
       </div>
     </div>
   );
