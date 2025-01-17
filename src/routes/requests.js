@@ -2,6 +2,7 @@ const express = require("express");
 const User = require("../models/user.js");
 const { userAuth } = require("../middlewares/auth.js");
 const ConnectionRequest = require("../models/connectionRequest.js");
+const sendEmail = require("../utils/sendEmail.js");
 
 const requestRouter = express.Router();
 
@@ -48,6 +49,21 @@ requestRouter.post(
       });
 
       const data = await connectionRequest.save();
+
+      //sending email from ses
+      // Dynamic subject and body
+      const subject = `A new friend request has been received from ${user.firstName}`;
+      const body = `
+        <h1>New Friend Request</h1>
+        <p>Hi ${recieverUser.firstName},</p>
+        <p>${user.firstName} has sent you a friend request.</p>
+        <p>Status: ${status}</p>
+        <p>Please log in to your account to view and respond.</p>
+      `;
+
+      // Send email using SES
+      const sendEmailRes = await sendEmail.run(subject, body);
+      console.log(sendEmailRes);
 
       res.json({
         message:

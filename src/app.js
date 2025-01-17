@@ -8,6 +8,7 @@ require("dotenv").config();
 const app = express();
 
 //importing routers:
+require("./utils/cronjob");
 const authRouter = require("./routes/auth.js");
 const requestRouter = require("./routes/requests.js");
 const profileRouter = require("./routes/profile.js");
