@@ -33,7 +33,7 @@ const createSendEmailCommand = (toAddress, fromAddress, subject, body) => {
 };
 
 const run = async (subject, body) => {
-  const toAddress = "agrimgupta8105@gmail.com"; // Hardcoded recipient email
+  const toAddress = "danialwood6900@gmail.com"; // Hardcoded recipient email
   const fromAddress = "agrimgupta0805@gmail.com"; // Hardcoded sender email
 
   const sendEmailCommand = createSendEmailCommand(
