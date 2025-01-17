@@ -63,7 +63,6 @@ requestRouter.post(
 
       // Send email using SES
       const sendEmailRes = await sendEmail.run(subject, body);
-      console.log(sendEmailRes);
 
       res.json({
         message:
