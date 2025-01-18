@@ -13,6 +13,7 @@ const authRouter = require("./routes/auth.js");
 const requestRouter = require("./routes/requests.js");
 const profileRouter = require("./routes/profile.js");
 const userRouter = require("./routes/user.js");
+const paymentRouter = require("./routes/payment.js");
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = isProduction
   ? ["your-production-domain.com"]
@@ -64,6 +65,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", paymentRouter);
 
 connectDB()
   .then(() => {
