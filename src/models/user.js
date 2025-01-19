@@ -56,6 +56,13 @@ const userSchema = new Schema(
         }
       },
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    membershipType: {
+      type: String,
+    },
     bio: {
       type: String,
       default: "This is a default bio",
