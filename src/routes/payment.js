@@ -27,8 +27,6 @@ paymentRouter.post("/payment/create-order", userAuth, async (req, res) => {
       },
     });
 
-    console.log(order);
-
     //saving to db and returning to fe
     const payment = new Payment({
       userId: loggedInUser._id,

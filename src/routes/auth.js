@@ -25,7 +25,6 @@ authRouter.post("/signup", async (req, res) => {
       photoUrl,
     } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
-    //* console.log(passwordHash);
 
     //storing
     const user = new User({

@@ -16,8 +16,6 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
 
 profileRouter.put("/profile/edit", userAuth, async (req, res) => {
   try {
-    console.log("Incoming update keys:", Object.keys(req.body)); // Debugging line
-
     if (!checkAllowedUpdates(req?.body)) {
       throw new Error("You are not allowed to update this field");
     }
