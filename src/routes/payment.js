@@ -42,7 +42,11 @@ paymentRouter.post("/payment/create-order", userAuth, async (req, res) => {
 
     const savedPayment = await payment.save();
 
-    res.json({ ...savedPayment.toJSON(), keyId: process.env.RAZORPAY_KEY_ID });
+    res.json({
+      ...savedPayment.toJSON(),
+      keyId: process.env.RAZORPAY_KEY_ID,
+      orderId: order.id,
+    });
   } catch (error) {
     res.status(500).send("ERROR :" + error.message);
   }
@@ -64,7 +68,9 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
 
     //update payment in DB
     const paymentDetails = req.body.payload.entity;
-    const payment = await Payment.findOne({ orderId: paymentDetails.order_id });
+    const payment = await Payment.findOne({
+      orderId: paymentDetails?.order_id,
+    });
     payment.status = paymentDetails.status;
     await payment.save();
 
