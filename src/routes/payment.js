@@ -71,7 +71,7 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
     const payment = await Payment.findOne({
       orderId: paymentDetails?.order_id,
     });
-    payment.status = paymentDetails.status;
+    payment.status = paymentDetails?.status;
     await payment.save();
 
     const user = await User.findOne({ _id: payment.userId });
@@ -80,11 +80,11 @@ paymentRouter.post("/payment/webhook", async (req, res) => {
     await user.save();
     //mark user as premium
 
-    if (req.body.event == "payment.captured") {
-    }
+    // if (req.body.event == "payment.captured") {
+    // }
 
-    if (req.body.event == "payment.filed") {
-    }
+    // if (req.body.event == "payment.filed") {
+    // }
 
     //return res.status(200)
     return res.status(200).send("Webhook processed successfully"); //!always returns 200, otherwise rzp goes into infinite loop
