@@ -3,25 +3,28 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-require("dotenv").config();
+const http = require("http");
 
+require("dotenv").config();
+require("./utils/cronjob");
 const app = express();
 
 //importing routers:
-require("./utils/cronjob");
 const authRouter = require("./routes/auth.js");
 const requestRouter = require("./routes/requests.js");
 const profileRouter = require("./routes/profile.js");
 const userRouter = require("./routes/user.js");
 const paymentRouter = require("./routes/payment.js");
+const initializeSocket = require("./utils/socket.js");
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = isProduction
   ? ["your-production-domain.com"]
   : ["http://localhost:5173"];
 
-// Middleware to parse JSON requests
+// Middlewares
 app.use(express.json());
 app.use(cookieParser());
+
 // app.use(
 //   cors({
 //     origin: "http://localhost:5173",
@@ -67,9 +70,12 @@ app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", paymentRouter);
 
+const server = http.createServer(app);
+initializeSocket(server);
+
 connectDB()
   .then(() => {
-    app.listen(4000, () => {
+    server.listen(4000, () => {
       console.log("Listening on port 4000");
     });
     console.log("Database connected successfully");
