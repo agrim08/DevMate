@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
@@ -16,6 +15,7 @@ const profileRouter = require("./routes/profile.js");
 const userRouter = require("./routes/user.js");
 const paymentRouter = require("./routes/payment.js");
 const initializeSocket = require("./utils/socket.js");
+const chatRouter = require("./routes/chat.js");
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = isProduction
   ? ["your-production-domain.com"]
@@ -69,6 +69,7 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", paymentRouter);
+app.use("/", chatRouter);
 
 const server = http.createServer(app);
 initializeSocket(server);
