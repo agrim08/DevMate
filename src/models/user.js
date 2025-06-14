@@ -85,12 +85,19 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+// Virtual field to check if profile is complete
+userSchema.virtual("isProfileComplete").get(function () {
+  return !!this.userAge && !!this.gender && !!this.bio && this.skills.length > 0;
+});
+
+// Include virtuals in JSON output
+userSchema.set("toJSON", { virtuals: true });
+
 userSchema.methods.getJWT = async function () {
   const user = this;
   const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
-
   return token;
 };
 
@@ -103,12 +110,5 @@ userSchema.methods.validatePassword = async function (userEnteredPassword) {
   );
   return isPasswordValid;
 };
-
-// userSchema.virtual("age").get(function () {
-//   if (!this.dateOfBirth) return null;
-//   const ageDiff = Date.now() - this.dateOfBirth.getTime();
-//   const ageDate = new Date(ageDiff);
-//   return Math.abs(ageDate.getUTCFullYear() - 1970);
-// });
 
 module.exports = mongoose.model("User", userSchema);

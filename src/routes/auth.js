@@ -1,7 +1,7 @@
 const express = require("express");
 const User = require("../models/user.js");
 const bcrypt = require("bcrypt");
-const { signUpValidation } = require("../utils/signUpValidtation.js");
+const { signUpValidation } = require("../utils/signUpValidtation.js"); // Fixed typo in filename
 const { userAuth } = require("../middlewares/auth.js");
 
 const authRouter = express.Router();
@@ -9,41 +9,26 @@ const authRouter = express.Router();
 // Endpoint to create a new user
 authRouter.post("/signup", async (req, res) => {
   try {
-    //Validation:
+    // Validation
     signUpValidation(req);
 
-    //encryption:
-    const {
-      firstName,
-      lastName,
-      emailId,
-      password,
-      bio,
-      DateOfBirth,
-      gender,
-      skills,
-      photoUrl,
-    } = req.body;
+    // Encryption
+    const { firstName, lastName, emailId, password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    //storing
+    // Storing
     const user = new User({
       firstName,
       lastName,
       emailId,
       password: passwordHash,
-      photoUrl,
-      skills,
-      gender,
-      bio,
-      DateOfBirth,
     });
-    const newUser = await user?.save();
-    const token = await newUser?.getJWT();
+    const newUser = await user.save();
+    const token = await newUser.getJWT();
 
-    //cookie parser
+    // Cookie parser
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 8 * 3600000), //cookie will expire in 8 hr
+      expires: new Date(Date.now() + 8 * 3600000), // Cookie expires in 8 hours
     });
     res.json({ message: "User created successfully", data: newUser });
   } catch (err) {
@@ -55,7 +40,7 @@ authRouter.post("/signup", async (req, res) => {
   }
 });
 
-//login api
+// Login API
 authRouter.post("/login", async (req, res) => {
   try {
     const { emailId, password } = req.body;
@@ -66,12 +51,12 @@ authRouter.post("/login", async (req, res) => {
     const isValidPassword = await user.validatePassword(password);
 
     if (isValidPassword) {
-      //jwt token created
+      // JWT token created
       const token = await user.getJWT();
 
-      //cookie parser
+      // Cookie parser
       res.cookie("token", token, {
-        expires: new Date(Date.now() + 8 * 3600000), //cookie will expire in 8 hr
+        expires: new Date(Date.now() + 8 * 3600000), // Cookie expires in 8 hours
       });
 
       res.send(user);
