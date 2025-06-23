@@ -18,7 +18,7 @@ const initializeSocket = require("./utils/socket.js");
 const chatRouter = require("./routes/chat.js");
 const isProduction = process.env.NODE_ENV === "production";
 const allowedOrigins = isProduction
-  ? ["your-production-domain.com"]
+  ? ["http://13.233.53.169/"]
   : ["http://localhost:5173"];
 
 // Middlewares

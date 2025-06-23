@@ -1,8 +1,7 @@
 const express = require("express");
-const {Chat} = require("../models/chat.js")
-const { userAuth } = require("../middlewares/auth");
-
 const chatRouter = express.Router();
+const { Chat } = require("../models/chat.js");
+const { userAuth } = require("../middlewares/auth.js");
 
 chatRouter.get("/chat/:targetUserId", userAuth, async (req, res) => {
   const { targetUserId } = req.params;
@@ -15,9 +14,6 @@ chatRouter.get("/chat/:targetUserId", userAuth, async (req, res) => {
   try {
     let chat = await Chat.findOne({
       participants: { $all: [userId, targetUserId] },
-    }).populate({
-      path: "messages.senderId",
-      select: "firstName lastName",
     });
 
     if (!chat) {
@@ -28,12 +24,11 @@ chatRouter.get("/chat/:targetUserId", userAuth, async (req, res) => {
       await chat.save();
     }
 
-    res.status(201).json(chat);
+    res.status(200).json(chat);
   } catch (error) {
     console.error("Error in chat retrieval or creation:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 
 module.exports = chatRouter;

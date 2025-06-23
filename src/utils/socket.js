@@ -53,7 +53,7 @@ const initializeSocket = (server) => {
             firstName, 
             content, 
             senderId: userId,
-            createdAt:newMessage.createdAtnpm 
+            createdAt:newMessage.createdAt
           });
         } catch (error) {
           console.log(error);
