@@ -4,7 +4,7 @@
 
 The backend service for DevMate - A Tinder-like platform for developers to connect, built with Node.js, Express, and MongoDB.
 
-🔗 **Frontend Repository**: [DevMate Frontend](https://github.com/yourusername/devmate-frontend)
+🔗 **Frontend Repository**: [DevMate Frontend](https://github.com/agrim08/DevMateFrontend)
 
 ## Features
 
