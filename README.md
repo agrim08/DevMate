@@ -62,3 +62,12 @@ npm run dev
 ```bash
 npm start
 ```
+
+## Deployment
+The application is deployed on AWS EC2 using:
+
+Nginx as reverse proxy
+PM2 for process management
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
