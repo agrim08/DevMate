@@ -33,15 +33,12 @@ The backend service for DevMate - A Tinder-like platform for developers to conne
 Create a `.env` file in the root directory with the following variables:
 
 ```env
-PORT=3001
 MONGODB_URI=your_mongodb_connection_string
 JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=30d
 RAZORPAY_KEY_ID=your_razorpay_key
 RAZORPAY_SECRET=your_razorpay_secret
 AWS_ACCESS_KEY_ID=your_aws_key
 AWS_SECRET_ACCESS_KEY=your_aws_secret
-AWS_REGION=your_aws_region
 FROM_EMAIL=your_verified_ses_email
 OTP_EXPIRY_MINUTES=10****
 ```
@@ -58,7 +55,7 @@ cd devmate-backend
 npm install
 npm run dev
 ```
-3.For production:
+3. For production:
 ```bash
 npm start
 ```
