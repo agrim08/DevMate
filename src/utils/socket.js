@@ -1,6 +1,7 @@
 const socket = require("socket.io");
 const crypto = require("crypto");
 const { Chat } = require("../models/chat");
+const ConnectionRequest = require("../models/connectionRequest");
 
 const getRoomId = (userId, targetUserId) => {
   return crypto
@@ -27,12 +28,23 @@ const initializeSocket = (server) => {
     socket.on(
       "sendMessage",
       async ({ firstName, userId, targetUserId, content }) => {
-        const room = getRoomId(userId, targetUserId);
         try {
+          const room = getRoomId(userId, targetUserId);
           let chat = await Chat.findOne({
             participants: { $all: [userId, targetUserId] },
           });
-    
+
+          // const checkConnected = await ConnectionRequest.findOne({
+          //   $or: [
+          //     { fromUserId:userId, toUserId:targetUserId, status:"accepted" },
+          //     { fromUserId: targetUserId, toUserId: userId, status:"accepted" },
+          //   ],
+          // });
+
+          // if(!checkConnected){
+          //   throw new Error("You cannot chat with this user")
+          // }
+
           if (!chat) {
             chat = new Chat({
               participants: [userId, targetUserId],
@@ -46,9 +58,9 @@ const initializeSocket = (server) => {
           };
     
           chat.messages.push(newMessage);
-    
+          
           await chat.save();
-    
+          
           io.to(room).emit("messageReceived", { 
             firstName, 
             content, 
