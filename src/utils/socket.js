@@ -20,59 +20,84 @@ const initializeSocket = (server) => {
 
   io.on("connection", (socket) => {
     socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
-      const room = getRoomId(userId, targetUserId);
-      console.log(`${firstName} joined room ${room}`);
-      socket.join(room);
+      try {
+        if (!userId || !targetUserId) {
+          socket.emit("error", { message: "Invalid user IDs" });
+          console.error("Join chat failed: Missing userId or targetUserId");
+          return;
+        }
+        const room = getRoomId(userId, targetUserId);
+        socket.join(room);
+        console.log(`${firstName || "Unknown"} joined room ${room}`);
+      } catch (error) {
+        socket.emit("error", { message: "Failed to join chat" });
+        console.error("Join chat error:", error.message);
+      }
     });
 
-    socket.on(
-      "sendMessage",
-      async ({ firstName, userId, targetUserId, content }) => {
-        try {
-          const room = getRoomId(userId, targetUserId);
-          let chat = await Chat.findOne({
-            participants: { $all: [userId, targetUserId] },
-          });
-
-          // const checkConnected = await ConnectionRequest.findOne({
-          //   $or: [
-          //     { fromUserId:userId, toUserId:targetUserId, status:"accepted" },
-          //     { fromUserId: targetUserId, toUserId: userId, status:"accepted" },
-          //   ],
-          // });
-
-          // if(!checkConnected){
-          //   throw new Error("You cannot chat with this user")
-          // }
-
-          if (!chat) {
-            chat = new Chat({
-              participants: [userId, targetUserId],
-              messages: [],
-            });
-          }
-          const newMessage = {
-            senderId: userId,
-            content,
-            createdAt: new Date(), // Add createdAt field
-          };
-    
-          chat.messages.push(newMessage);
-          
-          await chat.save();
-          
-          io.to(room).emit("messageReceived", { 
-            firstName, 
-            content, 
-            senderId: userId,
-            createdAt:newMessage.createdAt
-          });
-        } catch (error) {
-          console.log(error);
+    socket.on("sendMessage", async ({ firstName, userId, targetUserId, content }) => {
+      try {
+        if (!userId || !targetUserId || !content || !content.trim()) {
+          socket.emit("error", { message: "Invalid message data" });
+          console.error("Send message failed: Invalid data", { userId, targetUserId, content });
+          return;
         }
+
+        const room = getRoomId(userId, targetUserId);
+
+        // Validate connection
+        const checkConnected = await ConnectionRequest.findOne({
+          $or: [
+            { fromUserId: userId, toUserId: targetUserId, status: "accepted" },
+            { fromUserId: targetUserId, toUserId: userId, status: "accepted" },
+          ],
+        });
+
+        if (!checkConnected) {
+          socket.emit("error", { message: "You cannot chat with this user" });
+          console.error("Send message failed: Users not connected", { userId, targetUserId });
+          return;
+        }
+
+        let chat = await Chat.findOne({
+          participants: { $all: [userId, targetUserId] },
+        });
+
+        if (!chat) {
+          chat = new Chat({
+            participants: [userId, targetUserId],
+            messages: [],
+          });
+        }
+
+        const newMessage = {
+          senderId: userId,
+          content: content.trim(),
+          createdAt: new Date(),
+        };
+
+        chat.messages.push(newMessage);
+        await chat.save();
+
+        io.to(room).emit("messageReceived", {
+          firstName,
+          content: newMessage.content,
+          senderId: userId,
+          createdAt: newMessage.createdAt,
+        });
+      } catch (error) {
+        socket.emit("error", { message: "Failed to send message" });
+        console.error("Send message error:", error.message);
       }
-    );
-    socket.on("disconnect", () => {});
+    });
+
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
+    });
+
+    socket.on("disconnect", () => {
+      console.log("User disconnected:", socket.id);
+    });
   });
 };
 
