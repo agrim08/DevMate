@@ -81,6 +81,16 @@ const userSchema = new Schema(
         if (!validator.isURL(value)) throw new Error("Invalid Photo URL");
       },
     },
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    emailOTP: {
+      type: String,
+    },
+    emailOTPExpires: {
+      type: Date,
+    },
   },
   { timestamps: true }
 );
