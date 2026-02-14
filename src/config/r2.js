@@ -1,10 +1,14 @@
-import { S3Client } from "@aws-sdk/client-s3"
+import { S3Client } from "@aws-sdk/client-s3";
+import config from "./index.js";
 
+/**
+ * Initializes and exports the S3Client for Cloudflare R2 using centralized config.
+ */
 export const r2 = new S3Client({
   region: "auto",
-  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: `https://${config.r2.accountId}.r2.cloudflarestorage.com`,
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY,
-    secretAccessKey: process.env.R2_SECRET_KEY,
+    accessKeyId: config.r2.accessKeyId,
+    secretAccessKey: config.r2.secretAccessKey,
   },
-})
+});

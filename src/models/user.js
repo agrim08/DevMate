@@ -96,8 +96,9 @@ userSchema.virtual("isProfileComplete").get(function () {
   return !!this.userAge && !!this.gender && !!this.bio && this.skills.length > 0;
 });
 
-// Include virtuals in JSON output
+// Include virtuals in JSON and Object output
 userSchema.set("toJSON", { virtuals: true });
+userSchema.set("toObject", { virtuals: true });
 
 userSchema.methods.getJWT = async function () {
   const user = this;

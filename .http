@@ -147,3 +147,23 @@ Content-Type: application/json
 GET {{baseUrl}}/premium/verify
 
 ###
+
+
+### --- UPLOAD APIS ---
+
+# @name getUploadUrl
+# fileType can be image/jpeg, image/png, or image/webp
+GET {{baseUrl}}/upload/presigned-url?fileType=image/jpeg
+
+###
+
+# @name saveProfilePicture
+# Replace fileKey with the key returned by getUploadUrl
+POST {{baseUrl}}/upload/save-profile-picture
+Content-Type: application/json
+
+{
+    "fileKey": "profiles/USER_ID/photo-TIMESTAMP.jpg"
+}
+
+###

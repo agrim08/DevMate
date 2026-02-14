@@ -16,6 +16,7 @@ import profileRouter from "./routes/profile.routes.js";
 import userRouter from "./routes/user.routes.js";
 import paymentRouter from "./routes/payment.routes.js";
 import chatRouter from "./routes/chat.routes.js";
+import uploadRouter from "./routes/upload.routes.js";
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", paymentRouter);
 app.use("/", chatRouter);
+app.use("/", uploadRouter);
 
 // Global Error Handler
 app.use(errorHandler);

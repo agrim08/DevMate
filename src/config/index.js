@@ -22,6 +22,13 @@ const config = {
     secretKey: process.env.AWS_SECRET_KEY,
     region: process.env.AWS_REGION || "eu-north-1",
   },
+  r2: {
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID,
+    accessKeyId: process.env.R2_ACCESS_KEY,
+    secretAccessKey: process.env.R2_SECRET_KEY,
+    bucketName: process.env.R2_BUCKET_NAME,
+    cdnUrl: process.env.R2_CDN_URL, // Custom domain for serving images
+  },
   smtp: {
     host: process.env.SMTP_HOST,
     user: process.env.SMTP_USER,

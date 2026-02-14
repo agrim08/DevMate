@@ -11,7 +11,10 @@ const viewProfile = asyncHandler(async (req, res) => {
   const user = req.user;
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "Profile retrieved successfully"));
+    .json(new ApiResponse(200, {
+      ...user.toJSON(),
+      isProfileComplete: user.isProfileComplete
+    }, "Profile retrieved successfully"));
 });
 
 /**
@@ -29,7 +32,10 @@ const editProfile = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, `${user.firstName}, your profile has been updated successfully`));
+    .json(new ApiResponse(200, {
+      ...user.toJSON(),
+      isProfileComplete: user.isProfileComplete
+    }, `${user.firstName}, your profile has been updated successfully`));
 });
 
 /**
@@ -78,7 +84,10 @@ const completeProfile = asyncHandler(async (req, res) => {
 
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "Profile completed successfully"));
+    .json(new ApiResponse(200, {
+      ...user.toJSON(),
+      isProfileComplete: user.isProfileComplete
+    }, "Profile completed successfully"));
 });
 
 export { viewProfile, editProfile, completeProfile };

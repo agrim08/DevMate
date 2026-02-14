@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.js";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import config from "../config/index.js";
 
 /**
  * Middleware to authenticate a user based on the JWT token stored in cookies.
@@ -15,7 +16,7 @@ const userAuth = asyncHandler(async (req, res, next) => {
   }
 
   try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const decodedToken = jwt.verify(token, config.jwtSecret);
     const user = await User.findById(decodedToken._id);
 
     if (!user) {

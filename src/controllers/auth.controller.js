@@ -68,7 +68,10 @@ const login = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .cookie("token", token, options)
-    .json(new ApiResponse(200, user, "Login successful"));
+    .json(new ApiResponse(200, {
+      ...user.toJSON(),
+      isProfileComplete: user.isProfileComplete
+    }, "Login successful"));
 });
 
 /**
@@ -146,7 +149,10 @@ const verifyEmail = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .cookie("token", token, options)
-    .json(new ApiResponse(200, user, "Email verified successfully"));
+    .json(new ApiResponse(200, {
+      ...user.toJSON(),
+      isProfileComplete: user.isProfileComplete
+    }, "Email verified successfully"));
 });
 
 export { signup, login, logout, forgotPassword, verifyEmail };
