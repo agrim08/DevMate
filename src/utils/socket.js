@@ -3,6 +3,7 @@ import crypto from "crypto";
 import mongoose from "mongoose";
 import { Chat } from "../models/chat.js";
 import ConnectionRequest from "../models/connectionRequest.js";
+import config from "../config/index.js";
 
 const getRoomId = (userId, targetUserId) => {
   return crypto
@@ -18,7 +19,7 @@ const getRoomId = (userId, targetUserId) => {
 const initializeSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: ["http://localhost:5173", config.frontendUrl].filter(Boolean),
       methods: ["GET", "POST", "PUT", "PATCH"],
     },
   });

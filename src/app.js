@@ -8,8 +8,6 @@ import config from "./config/index.js";
 import "./utils/cronjob.js";
 import initializeSocket from "./utils/socket.js";
 import { errorHandler } from "./middlewares/error.middleware.js";
-
-// Import routers
 import authRouter from "./routes/auth.routes.js";
 import requestRouter from "./routes/request.routes.js";
 import profileRouter from "./routes/profile.routes.js";
@@ -31,9 +29,10 @@ if (config.nodeEnv === "development") {
 }
 
 // Set up CORS
-const allowedOrigins = config.nodeEnv === "production"
-  ? ["http://13.233.53.169/"] // Replace with actual production domain
-  : ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  config.frontendUrl,
+].filter(Boolean);
 
 app.use(
   cors({
