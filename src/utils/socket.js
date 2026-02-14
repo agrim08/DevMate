@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import crypto from "crypto";
+import mongoose from "mongoose";
 import { Chat } from "../models/chat.js";
 import ConnectionRequest from "../models/connectionRequest.js";
 
@@ -43,39 +44,41 @@ const initializeSocket = (server) => {
       try {
         if (!userId || !targetUserId || !content || !content.trim()) {
           socket.emit("error", { message: "Invalid message data" });
-          console.error("Send message failed: Invalid data", { userId, targetUserId, content });
           return;
         }
 
         const room = getRoomId(userId, targetUserId);
 
-        // Validate connection
+        // Explicitly cast to ObjectId for robust querying
+        const userOId = new mongoose.Types.ObjectId(userId);
+        const targetOId = new mongoose.Types.ObjectId(targetUserId);
+
+        // Validate connection status
         const checkConnected = await ConnectionRequest.findOne({
           $or: [
-            { fromUserId: userId, toUserId: targetUserId, status: "accepted" },
-            { fromUserId: targetUserId, toUserId: userId, status: "accepted" },
+            { fromUserId: userOId, toUserId: targetOId, status: "accepted" },
+            { fromUserId: targetOId, toUserId: userOId, status: "accepted" },
           ],
         });
 
         if (!checkConnected) {
-          socket.emit("error", { message: "You cannot chat with this user" });
-          console.error("Send message failed: Users not connected", { userId, targetUserId });
+          socket.emit("error", { message: "Security Protocol: Active connection required to transmit data." });
           return;
         }
 
         let chat = await Chat.findOne({
-          participants: { $all: [userId, targetUserId] },
+          participants: { $all: [userOId, targetOId] },
         });
 
         if (!chat) {
           chat = new Chat({
-            participants: [userId, targetUserId],
+            participants: [userOId, targetOId],
             messages: [],
           });
         }
 
         const newMessage = {
-          senderId: userId,
+          senderId: userOId,
           content: content.trim(),
           createdAt: new Date(),
         };
@@ -83,14 +86,16 @@ const initializeSocket = (server) => {
         chat.messages.push(newMessage);
         await chat.save();
 
+        // Transmit to the secure room
         io.to(room).emit("messageReceived", {
           firstName,
           content: newMessage.content,
-          senderId: userId,
+          senderId: userId, // Keep as string for frontend comparison
+          targetUserId: targetUserId, // Added for frontend relevance verification
           createdAt: newMessage.createdAt,
         });
       } catch (error) {
-        socket.emit("error", { message: "Failed to send message" });
+        socket.emit("error", { message: "Transmission failed. Neural link unstable." });
         console.error("Send message error:", error.message);
       }
     });
