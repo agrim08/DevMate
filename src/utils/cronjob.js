@@ -1,9 +1,12 @@
-const cron = require("node-cron");
-const { subDays, startOfDay, endOfDay } = require("date-fns");
-const ConnectionRequestModel = require("../models/connectionRequest");
-const sendEmail = require("./sendEmail");
+import cron from "node-cron";
+import { subDays, startOfDay, endOfDay } from "date-fns";
+import ConnectionRequestModel from "../models/connectionRequest.js";
+import { run as sendEmailRun } from "./sendEmail.js";
 
-//everyday at 8am
+/**
+ * Scheduled task to send email reminders for pending connection requests.
+ * Runs every day at 8:00 AM.
+ */
 cron.schedule("0 8 * * *", async () => {
   try {
     const yesterday = subDays(new Date(), 1);
@@ -17,20 +20,22 @@ cron.schedule("0 8 * * *", async () => {
         $lt: yesterdayEnd,
       },
     }).populate("fromUserId toUserId");
+    
     const emailList = [
       ...new Set(pendingRequest.map((req) => req.toUserId.emailId)),
     ];
 
     for (const email of emailList) {
       try {
-        const res = await sendEmail.run(
-          `New Friend request pending for ${email}`,
-          `There are so many pending requests, please login to your account to accept the requests`
+        await sendEmailRun(
+          `New connection requests pending for ${email}`,
+          `You have pending connection requests on DevMate. Please login to your account to review them.`
         );
       } catch (error) {
-        console.error(`Error sending email to ${email}:`, error);
-        throw new Error(`Error sending email to ${email}`);
+        console.error(`Failed to send reminder email to ${email}:`, error);
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Error in cron job:", error);
+  }
 });

@@ -1,5 +1,5 @@
-const { SendEmailCommand } = require("@aws-sdk/client-ses");
-const { sesClient } = require("./sesClient");
+import { SendEmailCommand } from "@aws-sdk/client-ses";
+import { sesClient } from "./sesClient.js";
 
 const createSendEmailCommand = (toAddress, fromAddress, subject, body) => {
   if (!body || !subject) {
@@ -32,6 +32,11 @@ const createSendEmailCommand = (toAddress, fromAddress, subject, body) => {
   });
 };
 
+/**
+ * Sends an email using AWS SES.
+ * @param {string} subject - The subject of the email.
+ * @param {string} body - The HTML body of the email.
+ */
 const run = async (subject, body) => {
   const toAddress = "danialwood6900@gmail.com"; // Hardcoded recipient email
   const fromAddress = "agrimgupta0805@gmail.com"; // Hardcoded sender email
@@ -47,10 +52,10 @@ const run = async (subject, body) => {
     return await sesClient.send(sendEmailCommand);
   } catch (caught) {
     if (caught instanceof Error && caught.name === "MessageRejected") {
-      return caught; // Handle MessageRejected error
+      return caught;
     }
-    throw caught; // Re-throw other errors
+    throw caught;
   }
 };
 
-module.exports = { run };
+export { run };

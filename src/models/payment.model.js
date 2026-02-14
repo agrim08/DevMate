@@ -1,10 +1,9 @@
-const mongoose = require("mongoose");
-const Schema = mongoose.Schema;
+import mongoose from "mongoose";
 
-const paymentSchema = new Schema(
+const paymentSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -47,4 +46,5 @@ const paymentSchema = new Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Payment", paymentSchema);
+const Payment = mongoose.model("Payment", paymentSchema);
+export default Payment;

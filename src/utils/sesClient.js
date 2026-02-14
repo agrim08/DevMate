@@ -1,13 +1,15 @@
-const { SESClient } = require("@aws-sdk/client-ses");
-// Set the AWS Region.
-const REGION = "eu-north-1";
-// Create SES service object.
+import { SESClient } from "@aws-sdk/client-ses";
+import config from "../config/index.js";
+
+/**
+ * Initializes and exports the AWS SES Client using centralized config.
+ */
 const sesClient = new SESClient({
-  region: REGION,
+  region: config.aws.region,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: config.aws.accessKey,
+    secretAccessKey: config.aws.secretKey,
   },
 });
 
-module.exports = { sesClient };
+export { sesClient };

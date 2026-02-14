@@ -1,15 +1,14 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+import mongoose from "mongoose";
 
-const connectionSchema = new Schema(
+const connectionSchema = new mongoose.Schema(
   {
     fromUserId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
     toUserId: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
@@ -37,9 +36,9 @@ connectionSchema.pre("save", function (next) {
   next();
 });
 
-const ConnectionRequestModel = new mongoose.model(
+const ConnectionRequestModel = mongoose.model(
   "ConnectionRequest",
   connectionSchema
 );
 
-module.exports = ConnectionRequestModel;
+export default ConnectionRequestModel;

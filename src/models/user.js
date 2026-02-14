@@ -1,14 +1,10 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
-const bcrypt = require("bcrypt");
-const validator = require("validator");
-const jwt = require("jsonwebtoken");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import validator from "validator";
+import jwt from "jsonwebtoken";
+import config from "../config/index.js";
 
-// Load environment variables
-dotenv.config();
-
-const userSchema = new Schema(
+const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -105,7 +101,7 @@ userSchema.set("toJSON", { virtuals: true });
 
 userSchema.methods.getJWT = async function () {
   const user = this;
-  const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+  const token = await jwt.sign({ _id: user._id }, config.jwtSecret, {
     expiresIn: "7d",
   });
   return token;
@@ -121,4 +117,6 @@ userSchema.methods.validatePassword = async function (userEnteredPassword) {
   return isPasswordValid;
 };
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+export default User;

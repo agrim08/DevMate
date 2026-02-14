@@ -1,0 +1,149 @@
+@baseUrl = http://localhost:4000
+
+### --- AUTH APIS ---
+
+# @name signup
+POST {{baseUrl}}/signup
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Doe",
+    "emailId": "john.doe@example.com",
+    "password": "Password@123"
+}
+
+###
+
+# @name login
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "emailId": "john.doe@example.com",
+    "password": "Password@123"
+}
+
+###
+
+# @name verifyEmail
+POST {{baseUrl}}/verify-email
+Content-Type: application/json
+
+{
+    "emailId": "john.doe@example.com",
+    "otp": "123456"
+}
+
+###
+
+# @name forgotPassword
+POST {{baseUrl}}/forgotPassword
+Content-Type: application/json
+
+{
+    "newPassword": "NewPassword@123"
+}
+
+###
+
+# @name logout
+POST {{baseUrl}}/logout
+
+###
+
+
+### --- PROFILE APIS ---
+
+# @name viewProfile
+GET {{baseUrl}}/profile/view
+
+###
+
+# @name editProfile
+PUT {{baseUrl}}/profile/edit
+Content-Type: application/json
+
+{
+    "firstName": "John",
+    "lastName": "Updated",
+    "skills": ["JavaScript", "Node.js", "React"]
+}
+
+###
+
+# @name completeProfile
+POST {{baseUrl}}/complete-profile
+Content-Type: application/json
+
+{
+    "userAge": "25",
+    "gender": "male",
+    "bio": "A passionate full-stack developer looking for collaborators.",
+    "skills": "JavaScript, Node.js, React, MongoDB",
+    "photoUrl": "https://avatars.githubusercontent.com/u/12345678?v=4"
+}
+
+###
+
+
+### --- USER & FEED APIS ---
+
+# @name getFeed
+GET {{baseUrl}}/feed?page=1&limit=10
+
+###
+
+# @name getPendingRequests
+GET {{baseUrl}}/user/requests/pending
+
+###
+
+# @name getConnections
+GET {{baseUrl}}/user/connections
+
+###
+
+
+### --- REQUEST APIS ---
+
+# replace :toUserId with an actual user id from the feed
+# status can be "interested" or "ignored"
+# @name sendRequest
+POST {{baseUrl}}/request/send/interested/670000000000000000000001
+
+###
+
+# replace :requestId with an actual request id
+# status can be "accepted" or "rejected"
+# @name reviewRequest
+POST {{baseUrl}}/request/review/accepted/670000000000000000000002
+
+###
+
+
+### --- CHAT APIS ---
+
+# replace :targetUserId with the ID of a connected user
+# @name getChat
+GET {{baseUrl}}/chat/670000000000000000000001
+
+###
+
+
+### --- PAYMENT APIS ---
+
+# @name createPaymentOrder
+POST {{baseUrl}}/payment/create-order
+Content-Type: application/json
+
+{
+    "membershipType": "emerald"
+}
+
+###
+
+# @name verifyPremium
+GET {{baseUrl}}/premium/verify
+
+###

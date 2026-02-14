@@ -1,8 +1,12 @@
-const Razorpay = require("razorpay");
+import Razorpay from "razorpay";
+import config from "../config/index.js";
 
-var instance = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
+/**
+ * Initializes and exports the Razorpay instance using centralized config.
+ */
+const instance = new Razorpay({
+  key_id: config.razorpay.keyId,
+  key_secret: config.razorpay.keySecret,
 });
 
-module.exports = instance;
+export default instance;

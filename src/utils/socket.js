@@ -1,7 +1,7 @@
-const socket = require("socket.io");
-const crypto = require("crypto");
-const { Chat } = require("../models/chat");
-const ConnectionRequest = require("../models/connectionRequest");
+import { Server } from "socket.io";
+import crypto from "crypto";
+import { Chat } from "../models/chat.js";
+import ConnectionRequest from "../models/connectionRequest.js";
 
 const getRoomId = (userId, targetUserId) => {
   return crypto
@@ -10,8 +10,12 @@ const getRoomId = (userId, targetUserId) => {
     .digest("hex");
 };
 
+/**
+ * Initializes Socket.io for real-time communication.
+ * @param {http.Server} server - The HTTP server instance.
+ */
 const initializeSocket = (server) => {
-  const io = socket(server, {
+  const io = new Server(server, {
     cors: {
       origin: "http://localhost:5173",
       methods: ["GET", "POST", "PUT", "PATCH"],
@@ -101,4 +105,4 @@ const initializeSocket = (server) => {
   });
 };
 
-module.exports = initializeSocket;
+export default initializeSocket;

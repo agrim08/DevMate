@@ -1,10 +1,9 @@
-const mongoose = require("mongoose");
-const { Schema } = mongoose;
+import mongoose from "mongoose";
 
-const messageSchema = new Schema(
+const messageSchema = new mongoose.Schema(
   {
     senderId: {
-      type: mongoose.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
@@ -16,13 +15,13 @@ const messageSchema = new Schema(
   { timestamps: true }
 );
 
-const chatSchema = new Schema({
+const chatSchema = new mongoose.Schema({
   participants: [
-    { type: mongoose.Types.ObjectId, required: true, ref: "User" },
+    { type: mongoose.Schema.Types.ObjectId, required: true, ref: "User" },
   ],
   messages: [messageSchema],
 });
 
 const Chat = mongoose.model("Chat", chatSchema);
 
-module.exports = { Chat };
+export { Chat };

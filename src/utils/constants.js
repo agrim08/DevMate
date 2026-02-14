@@ -1,6 +1,6 @@
-const membershipAmount = {
+export const membershipAmount = {
   emerald: 600,
   diamond: 1200,
 };
 
-module.exports = membershipAmount;
+export const DB_NAME = "devmate";
