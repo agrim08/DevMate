@@ -1,5 +1,7 @@
 import User from "../models/user.js";
 import ConnectionRequest from "../models/connectionRequest.js";
+import { startOfDay, endOfDay } from "date-fns";
+import { connectionLimits } from "../utils/constants.js";
 import { run as sendEmailRun } from "../utils/sendEmail.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -15,6 +17,31 @@ const sendConnectionRequest = asyncHandler(async (req, res) => {
   const ALLOWED_STATUS = ["interested", "ignored"];
   if (!ALLOWED_STATUS.includes(status)) {
     throw new ApiError(400, "Invalid status type: " + status);
+  }
+
+  // Check connection request limits for "interested" status only
+  if (status === "interested") {
+    const todayStart = startOfDay(new Date());
+    const todayEnd = endOfDay(new Date());
+
+    const requestCount = await ConnectionRequest.countDocuments({
+      fromUserId: fromUser._id,
+      status: "interested",
+      createdAt: {
+        $gte: todayStart,
+        $lte: todayEnd,
+      },
+    });
+
+    const userTier = fromUser.membershipType || "free";
+    const limit = connectionLimits[userTier];
+
+    if (requestCount >= limit) {
+      throw new ApiError(
+        403,
+        `Daily connection limit reached for ${userTier} tier. Upgrade to send more requests.`
+      );
+    }
   }
 
   if (fromUser._id.toString() === toUserId.toString()) {

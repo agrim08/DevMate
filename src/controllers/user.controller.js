@@ -10,6 +10,7 @@ const POPULATE_DATA_FIELDS = [
   "bio",
   "gender",
   "skills",
+  "membershipType",
 ];
 
 /**

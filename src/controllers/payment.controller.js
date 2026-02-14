@@ -1,7 +1,7 @@
 import rzpInstance from "../utils/razorpay.js";
 import Payment from "../models/payment.model.js";
 import { membershipAmount } from "../utils/constants.js";
-import { validateWebhookSignature } from "razorpay/dist/utils/razorpay-utils.js";
+import { validateWebhookSignature, validatePaymentVerification } from "razorpay/dist/utils/razorpay-utils.js";
 import User from "../models/user.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -41,7 +41,11 @@ const createOrder = asyncHandler(async (req, res) => {
     amount: order.amount,
     currency: order.currency,
     receipt: order.receipt,
-    notes: order.notes,
+    notes: {
+      membershipType: membershipType,
+      firstName: loggedInUser.firstName,
+      lastName: loggedInUser.lastName,
+    },
   });
 
   const savedPayment = await payment.save();
@@ -83,6 +87,7 @@ const handleWebhook = asyncHandler(async (req, res) => {
       const user = await User.findById(payment.userId);
       if (user) {
         user.isPremium = true;
+        // Access nested notes property correctly from payment model which stores it
         user.membershipType = payment.notes.membershipType;
         await user.save();
       }
@@ -93,13 +98,43 @@ const handleWebhook = asyncHandler(async (req, res) => {
 });
 
 /**
- * Verifies if the user is a premium member.
+ * Verifies payment signature and updates user status immediately.
  */
-const verifyPremium = asyncHandler(async (req, res) => {
-  const user = req.user;
+const verifyPayment = asyncHandler(async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+  
+  const secret = process.env.RAZORPAY_KEY_SECRET;
+  
+  // Verify using Razorpay util
+  const isValid = validatePaymentVerification(
+    { order_id: razorpay_order_id, payment_id: razorpay_payment_id },
+    razorpay_signature,
+    secret
+  );
+
+  if (!isValid) {
+    throw new ApiError(400, "Payment verification failed");
+  }
+
+  // Update Payment Record
+  const payment = await Payment.findOne({ orderId: razorpay_order_id });
+  if (!payment) {
+      throw new ApiError(404, "Order not found");
+  }
+  
+  payment.paymentId = razorpay_payment_id;
+  payment.status = "captured"; // Assuming successful frontend verification implies captured/authorized
+  await payment.save();
+
+  // Update User Record Immediately
+  const user = await User.findById(req.user._id);
+  user.isPremium = true;
+  user.membershipType = payment.notes.membershipType;
+  await user.save();
+
   return res
     .status(200)
-    .json(new ApiResponse(200, user, "Premium verification successful"));
+    .json(new ApiResponse(200, user, "Payment verified and user upgraded successfully"));
 });
 
-export { createOrder, handleWebhook, verifyPremium };
+export { createOrder, handleWebhook, verifyPayment };
