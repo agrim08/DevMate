@@ -12,6 +12,9 @@ const getRoomId = (userId, targetUserId) => {
     .digest("hex");
 };
 
+// Map to track online users: userId -> set of socketIds (handling multiple tabs)
+const userSocketMap = new Map();
+
 /**
  * Initializes Socket.io for real-time communication.
  * @param {http.Server} server - The HTTP server instance.
@@ -25,11 +28,34 @@ const initializeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
+    // Authenticate user on connection
+    const userId = socket.handshake.query.userId;
+    
+    if (userId) {
+      if (!userSocketMap.has(userId)) {
+        userSocketMap.set(userId, new Set());
+      }
+      userSocketMap.get(userId).add(socket.id);
+      
+      // Notify everyone that this user is now online
+      io.emit("userStatusUpdate", { userId, status: "online" });
+      console.log(`User ${userId} connected. Total online: ${userSocketMap.size}`);
+    }
+
+    // New request notification
+    socket.on("newConnectionRequest", ({ toUserId }) => {
+      const targetSockets = userSocketMap.get(toUserId);
+      if (targetSockets) {
+        targetSockets.forEach(socketId => {
+          io.to(socketId).emit("requestCountUpdate");
+        });
+      }
+    });
+
     socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
       try {
         if (!userId || !targetUserId) {
           socket.emit("error", { message: "Invalid user IDs" });
-          console.error("Join chat failed: Missing userId or targetUserId");
           return;
         }
         const room = getRoomId(userId, targetUserId);
@@ -37,7 +63,6 @@ const initializeSocket = (server) => {
         console.log(`${firstName || "Unknown"} joined room ${room}`);
       } catch (error) {
         socket.emit("error", { message: "Failed to join chat" });
-        console.error("Join chat error:", error.message);
       }
     });
 
@@ -49,12 +74,9 @@ const initializeSocket = (server) => {
         }
 
         const room = getRoomId(userId, targetUserId);
-
-        // Explicitly cast to ObjectId for robust querying
         const userOId = new mongoose.Types.ObjectId(userId);
         const targetOId = new mongoose.Types.ObjectId(targetUserId);
 
-        // Validate connection status
         const checkConnected = await ConnectionRequest.findOne({
           $or: [
             { fromUserId: userOId, toUserId: targetOId, status: "accepted" },
@@ -63,7 +85,7 @@ const initializeSocket = (server) => {
         });
 
         if (!checkConnected) {
-          socket.emit("error", { message: "Security Protocol: Active connection required to transmit data." });
+          socket.emit("error", { message: "Security Protocol: Active connection required." });
           return;
         }
 
@@ -72,10 +94,7 @@ const initializeSocket = (server) => {
         });
 
         if (!chat) {
-          chat = new Chat({
-            participants: [userOId, targetOId],
-            messages: [],
-          });
+          chat = new Chat({ participants: [userOId, targetOId], messages: [] });
         }
 
         const newMessage = {
@@ -87,26 +106,47 @@ const initializeSocket = (server) => {
         chat.messages.push(newMessage);
         await chat.save();
 
-        // Transmit to the secure room
+        // Broadcast message to room
         io.to(room).emit("messageReceived", {
           firstName,
           content: newMessage.content,
-          senderId: userId, // Keep as string for frontend comparison
-          targetUserId: targetUserId, // Added for frontend relevance verification
+          senderId: userId,
+          targetUserId: targetUserId,
           createdAt: newMessage.createdAt,
         });
+
+        // Notify target user globally (for unread count)
+        const targetSockets = userSocketMap.get(targetUserId);
+        if (targetSockets) {
+          targetSockets.forEach(id => {
+            // Only emit if they aren't in the specific room? 
+            // Actually, frontend can decide to increment unread if they aren't active in that chat.
+            io.to(id).emit("globalMessageReceived", {
+              senderId: userId,
+              content: newMessage.content,
+              createdAt: newMessage.createdAt
+            });
+          });
+        }
+
       } catch (error) {
-        socket.emit("error", { message: "Transmission failed. Neural link unstable." });
-        console.error("Send message error:", error.message);
+        socket.emit("error", { message: "Transmission failed." });
       }
     });
 
-    socket.on("error", (error) => {
-      console.error("Socket error:", error);
+    socket.on("getOnlineUsers", () => {
+      socket.emit("onlineUsersList", Array.from(userSocketMap.keys()));
     });
 
     socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
+      if (userId && userSocketMap.has(userId)) {
+        userSocketMap.get(userId).delete(socket.id);
+        if (userSocketMap.get(userId).size === 0) {
+          userSocketMap.delete(userId);
+          io.emit("userStatusUpdate", { userId, status: "offline" });
+          console.log(`User ${userId} fully disconnected.`);
+        }
+      }
     });
   });
 };
