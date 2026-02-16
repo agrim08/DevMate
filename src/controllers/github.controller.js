@@ -1,13 +1,13 @@
 import { Octokit } from "octokit";
 import config from "../config/index.js";
-import User from "../models/User.js";
+import User from "../models/user.js";
 import { encryptToken, fetchGitHubData } from "../services/github.service.js";
 import { githubSyncQueue } from "../config/queue.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const connectGitHub = asyncHandler(async (req, res) => {
-  const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${config.github.clientId}&scope=read:user,repo`;
+  const redirectUrl = `https://github.com/login/oauth/authorize?client_id=${config.github.clientId}&scope=read:user,repo&redirect_uri=${encodeURIComponent(config.github.callbackUrl)}`;
   res.redirect(redirectUrl);
 });
 
@@ -30,6 +30,7 @@ export const githubCallback = asyncHandler(async (req, res) => {
         client_id: config.github.clientId,
         client_secret: config.github.clientSecret,
         code,
+        redirect_uri: config.github.callbackUrl,
       }),
     });
 
