@@ -60,14 +60,15 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
 // Route Declarations
-app.use("/", authRouter);
-app.use("/", profileRouter);
-app.use("/", requestRouter);
-app.use("/", userRouter);
-app.use("/", paymentRouter);
-app.use("/", chatRouter);
-app.use("/", uploadRouter);
-app.use("/github", githubRouter);
+app.use("/api", authRouter);
+app.use("/api", profileRouter);
+app.use("/api", requestRouter);
+app.use("/api", userRouter);
+app.use("/api", paymentRouter);
+app.use("/api", chatRouter);
+app.use("/api", uploadRouter);
+app.use("/api/github", githubRouter);
+
 
 // Global Error Handler
 app.use(errorHandler);
