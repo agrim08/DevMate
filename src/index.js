@@ -1,9 +1,11 @@
 import config from "./config/index.js";
 import connectDB from "./config/database.js";
 import { server } from "./app.js";
+import "./workers/github.worker.js";
 
 const PORT = config.port;
 
+console.log("Connecting to:", config.mongodbUri);
 connectDB()
     .then(() => {
         server.on("error", (error) => {

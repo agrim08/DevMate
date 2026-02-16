@@ -81,11 +81,25 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    emailOTP: {
-      type: String,
-    },
     emailOTPExpires: {
       type: Date,
+    },
+    github: {
+      username: String,
+      totalRepos: Number,
+      totalStars: Number,
+      languages: {
+        type: Map,
+        of: Number,
+      },
+      contributionCalendar: [
+        {
+          date: String,
+          count: Number,
+        },
+      ],
+      lastSyncedAt: Date,
+      accessTokenEncrypted: String,
     },
   },
   { timestamps: true }
@@ -118,6 +132,6 @@ userSchema.methods.validatePassword = async function (userEnteredPassword) {
   return isPasswordValid;
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
 
 export default User;
