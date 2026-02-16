@@ -12,8 +12,11 @@ const userAuth = asyncHandler(async (req, res, next) => {
   const { token } = req.cookies;
   
   if (!token) {
+    console.log("DEBUG: Auth failed - No token found in cookies.");
+    console.log("DEBUG: All Cookies:", req.cookies);
     throw new ApiError(401, "Authentication required. Please login.");
   }
+
 
   try {
     const decodedToken = jwt.verify(token, config.jwtSecret);

@@ -19,6 +19,10 @@ import githubRouter from "./routes/github.routes.js";
 
 const app = express();
 
+// Enable trust proxy for Render/Vercel (needed for secure cookies)
+app.set("trust proxy", 1);
+
+
 // Security HTTP headers
 app.use(helmet());
 

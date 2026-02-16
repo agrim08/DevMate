@@ -57,13 +57,17 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const token = await user.getJWT();
+  const isProduction = config.nodeEnv === "production" || process.env.NODE_ENV === "production";
+
 
   const options = {
     expires: new Date(Date.now() + 8 * 3600000),
     httpOnly: true,
-    secure: config.nodeEnv === "production",
-    sameSite: config.nodeEnv === "production" ? "none" : "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   };
+
+
 
   return res
     .status(200)
@@ -78,11 +82,13 @@ const login = asyncHandler(async (req, res) => {
  * Handles user logout.
  */
 const logout = asyncHandler(async (req, res) => {
+  const isProduction = config.nodeEnv === "production" || process.env.NODE_ENV === "production";
   const options = {
     httpOnly: true,
-    secure: config.nodeEnv === "production",
-    sameSite: config.nodeEnv === "production" ? "none" : "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   };
+
 
   return res
     .status(200)
@@ -139,12 +145,14 @@ const verifyEmail = asyncHandler(async (req, res) => {
 
   const token = await user.getJWT();
 
+  const isProduction = config.nodeEnv === "production" || process.env.NODE_ENV === "production";
   const options = {
     httpOnly: true,
     expires: new Date(Date.now() + 8 * 3600000),
-    secure: config.nodeEnv === "production",
-    sameSite: config.nodeEnv === "production" ? "none" : "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   };
+
 
   return res
     .status(200)
