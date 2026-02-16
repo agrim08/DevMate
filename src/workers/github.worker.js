@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import config from "../config/index.js";
 import { githubSyncQueue } from "../config/queue.js"; // Import queue config if needed, or just redis config
-import User from "../models/User.js";
+import User from "../models/user.js";
 import { fetchGitHubData, decryptToken } from "../services/github.service.js";
 
 const redisConnection = {
