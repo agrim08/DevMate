@@ -4,11 +4,12 @@ import { githubSyncQueue } from "../config/queue.js"; // Import queue config if 
 import User from "../models/user.js";
 import { fetchGitHubData, decryptToken } from "../services/github.service.js";
 
-const redisConnection = {
+const redisConnection = process.env.REDIS_URL || {
   host: process.env.REDIS_HOST || "localhost",
   port: process.env.REDIS_PORT || 6379,
   password: process.env.REDIS_PASSWORD || undefined,
 };
+
 
 const processGitHubSync = async (job) => {
   const { userId } = job.data;
