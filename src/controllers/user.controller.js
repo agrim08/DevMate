@@ -1,5 +1,6 @@
 import User from "../models/user.js";
 import ConnectionRequest from "../models/connectionRequest.js";
+import { Chat } from "../models/chat.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
@@ -44,11 +45,21 @@ const getConnections = asyncHandler(async (req, res) => {
     .populate("fromUserId", POPULATE_DATA_FIELDS)
     .populate("toUserId", POPULATE_DATA_FIELDS);
 
-  const data = connections.map((row) => {
-    return row.fromUserId._id.toString() === loggedInUser._id.toString()
+  const data = await Promise.all(connections.map(async (row) => {
+    const user = row.fromUserId._id.toString() === loggedInUser._id.toString()
       ? row.toUserId
       : row.fromUserId;
-  });
+    
+    // Find the chat for this connection and get last message time
+    const chat = await Chat.findOne({
+      participants: { $all: [loggedInUser._id, user._id] }
+    }).select({ messages: { $slice: -1 } }); 
+    
+    return {
+      ...user.toObject(),
+      lastMessageAt: chat?.messages?.[0]?.createdAt || row.updatedAt
+    };
+  }));
 
   return res
     .status(200)
