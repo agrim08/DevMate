@@ -19,29 +19,27 @@ const sendConnectionRequest = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid status type: " + status);
   }
 
-  // Check connection request limits for "interested" status only
-  if (status === "interested") {
-    const todayStart = startOfDay(new Date());
-    const todayEnd = endOfDay(new Date());
+  // Check daily connection request limits (for both interested and ignored actions)
+  const todayStart = startOfDay(new Date());
+  const todayEnd = endOfDay(new Date());
 
-    const requestCount = await ConnectionRequest.countDocuments({
-      fromUserId: fromUser._id,
-      status: "interested",
-      createdAt: {
-        $gte: todayStart,
-        $lte: todayEnd,
-      },
-    });
+  const requestCount = await ConnectionRequest.countDocuments({
+    fromUserId: fromUser._id,
+    status: { $in: ["interested", "ignored"] },
+    createdAt: {
+      $gte: todayStart,
+      $lte: todayEnd,
+    },
+  });
 
-    const userTier = fromUser.membershipType || "free";
-    const limit = connectionLimits[userTier];
+  const userTier = fromUser.membershipType || "free";
+  const limit = connectionLimits[userTier];
 
-    if (requestCount >= limit) {
-      throw new ApiError(
-        403,
-        `Daily connection limit reached for ${userTier} tier. Upgrade to send more requests.`
-      );
-    }
+  if (requestCount >= limit) {
+    throw new ApiError(
+      403,
+      `Daily connection limit reach for ${userTier} tier. Upgrade to interact with more profiles.`
+    );
   }
 
   if (fromUser._id.toString() === toUserId.toString()) {

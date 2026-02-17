@@ -43,7 +43,7 @@ const editProfile = asyncHandler(async (req, res) => {
  */
 const completeProfile = asyncHandler(async (req, res) => {
   const user = req.user;
-  const { userAge, gender, bio, skills, photoUrl } = req.body;
+  const { userAge, gender, bio, skills, photoUrl, city, state, country } = req.body;
 
   if (!userAge || isNaN(parseInt(userAge))) {
     throw new ApiError(400, "Age must be a valid number");
@@ -79,6 +79,10 @@ const completeProfile = asyncHandler(async (req, res) => {
   user.bio = bio;
   user.skills = skillsArray;
   if (photoUrl) user.photoUrl = photoUrl;
+  if (city) user.city = city.trim();
+  if (state) user.state = state.trim();
+  if (country) user.country = country.trim();
+
 
   await user.save();
 

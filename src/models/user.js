@@ -59,7 +59,17 @@ const userSchema = new mongoose.Schema(
     membershipType: {
       type: String,
     },
+    city: {
+      type: String,
+    },
+    state: {
+      type: String,
+    },
+    country: {
+      type: String,
+    },
     bio: {
+
       type: String,
       default: "This is a default bio",
       minLength: 20,

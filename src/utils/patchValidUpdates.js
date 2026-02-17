@@ -7,7 +7,11 @@ const ALLOWED_UPDATES = [
   "skills",
   "firstName",
   "lastName",
+  "city",
+  "state",
+  "country",
 ];
+
 
 /**
  * Checks if the keys in the provided data object are within the allowed updates list.

@@ -12,6 +12,11 @@ const POPULATE_DATA_FIELDS = [
   "gender",
   "skills",
   "membershipType",
+  "userAge",
+  "city",
+  "state",
+  "country",
+  "github",
 ];
 
 /**
